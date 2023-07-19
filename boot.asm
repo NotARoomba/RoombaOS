@@ -1,17 +1,33 @@
-mov ah, 0x0e
-mov al, 'A'
-int 0x10
-loop:
-	inc al
-	add al, 32
+[org 0x7c00]
+mov ah, 0
+int 0x16
+mov bx, buffer
+mov [bx], al
+inc bx
+jmp bloop
+buffer:
+	times 10 db 0
+bloop:
+	mov ah, 0
+	int 0x16
+	cmp bx, buffer+10
+	je printBuffer
+	mov [bx], al
+	inc bx
+	jmp bloop
+printBuffer:
+	mov ah, 0x0e
+	mov bx, buffer
+	jmp ploop
+ploop:
+	mov al, [bx]
+	cmp bx, buffer+10
+	je end
 	int 0x10
-	inc al
-	cmp al, 'z' + 1
-	je end	
-	sub al, 32
-	int 0x10
-	jmp loop
-
+	inc bx
+	jmp ploop
+			
+	
 end:
 	jmp $
 times 510-($-$$) db 0
