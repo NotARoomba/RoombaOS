@@ -1,3 +1,4 @@
+[bits 16]
 [org 0x7c00]
 
 KERNEL_OFFSET equ 0x1000
@@ -6,6 +7,9 @@ BOOT_DISK: db 0
 mov [BOOT_DISK], dl ; set boot disk
 
 ; stack and base pointer
+xor ax, ax
+mov es, ax
+mov ds, ax
 mov bp, 0x9000
 mov sp, bp
 
@@ -19,10 +23,8 @@ jmp $
 
 %include "disk.asm"
 %include "print.asm"
-%include "print32.asm"
 %include "gdt.asm"
-%include "switch.asm"
-[bits 16]
+
 load_kernel:
 	mov bx, MSG_LOAD_KERNEL
 	call print
@@ -32,11 +34,15 @@ load_kernel:
 	mov dl, [BOOT_DISK]
 	call disk_load
 	ret
+
+%include "switch.asm"
+%include "print32.asm"
+
 [bits 32]
 START_PM:
 	mov ebx, MSG_PROT_MODE
 	call print_pm
-	call KERNEL_OFFSET
+	;call KERNEL_OFFSET
 	jmp $
 
 MSG_REAL_MODE: db "Started in 16-bit real mode", 0

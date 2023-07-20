@@ -7,7 +7,7 @@ FLAGS=-ffreestanding -m32 -fno-pie
 
 .PHONY: run	
 run: clean build
-	qemu-system-i386 --nographic -fda RoombaOS.bin	
+	qemu-system-i386 -fda RoombaOS.bin	
 build: boot.bin kernel.bin
 	cat boot.bin kernel.bin > RoombaOS.bin
 boot.bin:

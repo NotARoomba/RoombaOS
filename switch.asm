@@ -1,9 +1,9 @@
 [bits 16]
 switch_to_pm:
+	mov ax, 0x2401 ; A20?
+	int 0x15
 	cli
 	lgdt [gdt_descriptor]
-	mov bx, ABOUT_TO
-	call print
 	mov eax, cr0
 	or eax, 0x1
 	mov cr0, eax
