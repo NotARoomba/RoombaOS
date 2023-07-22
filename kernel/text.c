@@ -1,5 +1,5 @@
 #include "text.h"
-#include "screen.h"
+#include "../drivers/screen.h"
 
 const u8 FONT[128][8] = {
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0000 (nul)
@@ -131,18 +131,17 @@ const u8 FONT[128][8] = {
     { 0x6E, 0x3B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+007E (~)
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}    // U+007F
 };
-void draw_char(int _x, int _y, char c, char color) {
+void draw_char(int _x, int _y, char c, u8 color) {
     const u8 *chr = FONT[(int)c];
     for (int y = 0; y < 8; y++) {
         for (int x = 0; x < 8; x++) {
-            //draw_pixel(20, 20, 0x0a);
-            if (chr[y] & ((unsigned char)1U << x)) {
-                draw_pixel(x + _x, x + _y, 0x0a);
+            if (chr[y] & (1 << x)) {
+                draw_pixel(x + _x, y + _y, color);
             }
         }
     }
 }
-void draw_text(int _x, int _y, char *string, char color) {
+void draw_text(int _x, int _y, char *string, u8 color) {
     while (*string != 0) {
         draw_char(_x, _y, *string, color);
         _x += 8;

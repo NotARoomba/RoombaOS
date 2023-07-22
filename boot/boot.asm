@@ -23,21 +23,56 @@ jmp $
 %include "./boot/print.asm"
 %include "./boot/gdt.asm"
 switch_to_pm:
-	mov ax, 0x2401 ; A20?
-	int 0x15
-	; text mode
-	; mov ah, 0x0
-	; mov al, 0x3
-	; int 0x10
-	;video mode
-	mov ax, 0x13
+	call activate_a20
+	;text mode
+	mov ah, 0x0
+	mov al, 0x3
 	int 0x10
+	;video mode
+	; mov ax, 0x13
+	; int 0x10
 	cli
 	lgdt [gdt_descriptor]
 	mov eax, cr0
 	or eax, 0x1
 	mov cr0, eax
 	jmp CODE_SEG:START_PM
+activate_a20:
+	pusha
+	mov     ax,2403h                ;--- A20-Gate Support ---
+	int     15h
+	jb      a20_ns                  ;INT 15h is not supported
+	cmp     ah,0
+	jnz     a20_ns                  ;INT 15h is not supported
+	
+	mov     ax,2402h                ;--- A20-Gate Status ---
+	int     15h
+	jb      a20_failed              ;couldn't get status
+	cmp     ah,0
+	jnz     a20_failed              ;couldn't get status
+	
+	cmp     al,1
+	jz      a20_activated           ;A20 is already activated
+	
+	mov     ax,2401h                ;--- A20-Gate Activate ---
+	int     15h
+	jb      a20_failed              ;couldn't activate the gate
+	cmp     ah,0
+	jnz     a20_failed              ;couldn't activate the gate
+
+a20_ns:
+	mov bx, A20_NS
+	call print
+	jmp $
+a20_failed:
+	mov bx, A20_ERROR
+	call print
+	jmp $
+a20_activated:
+	mov bx, A20_SUCCESS
+	call print
+	popa
+	ret
 load_kernel:
 	mov bx, MSG_LOAD_KERNEL
 	call print
@@ -58,17 +93,16 @@ START_PM:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-
 	mov ebp, 0x90000
 	mov esp, ebp
-
-	; mov ebx, MSG_PROT_MODE
-	; call print_pm
 	call KERNEL_OFFSET
 	jmp $
 
 MSG_REAL_MODE: db "Started in 16-bit real mode", 0
 MSG_PROT_MODE: db "Loaded 32-bit protected mode", 0
 MSG_LOAD_KERNEL: db "Loading kernel...", 0
+A20_NS: db "A20 NS", 0
+A20_ERROR: db "A20 Failed", 0
+A20_SUCCESS: db "A20 Done", 0
 times 510-($-$$) db 0
 db 0x55, 0xaa

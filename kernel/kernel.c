@@ -1,14 +1,12 @@
 
 #include "util.h"
 #include "text.h"
-#include "screen.h"
+#include "../drivers/screen.h"
 
 void kmain() {
-  // screen_clear(0x00);
-  for(int i = 0; i<10; i++) {
-    draw_pixel(i,i,0x0a);
-  }
-  draw_char(100, 100, 35, 0x0a);
-  //print("aaaaaaaaaaaaa", 0x0a);
-  //print_c('X', 0x0a);
+  // Graphics mode test
+  //draw_text(0, 0, "Welcome to RoombaOS!", 0x0a);
+  // Test mode test
+  print("start", 0x0a, -1, -1);
+  print("hello\nworld", 0x0a, 45, 23);
 }
