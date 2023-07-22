@@ -1,5 +1,7 @@
 #include "screen.h"
 #include "ports.h"
+#include "../libc/mem.h"
+#include "../libc/math.h"
 
 void __stack_chk_fail(){};
 // Graphics mode function
@@ -10,11 +12,10 @@ void draw_pixel(int _x, int _y, u8 color) {
 
 
 int get_cursor_pos() {
-    int offset = 0;
-    outb(REG_SCREEN_CTRL, 0x0F);
-    offset |= inb(REG_SCREEN_DATA);
-    outb(REG_SCREEN_CTRL, 0x0E);
-    offset |= ((u16)inb(REG_SCREEN_DATA)) << 8;
+    outb(REG_SCREEN_CTRL, 14);
+    int offset = inb(REG_SCREEN_DATA) << 8; /* High byte: << 8 */
+    outb(REG_SCREEN_CTRL, 15);
+    offset += inb(REG_SCREEN_DATA);
     //times 2 because of 1 st byte of the character and then the second one for the color
     return offset*2;
 }
@@ -25,16 +26,25 @@ void update_cursor(int offset) {
 	outb(REG_SCREEN_CTRL, 0x0E);
 	outb(REG_SCREEN_DATA, (u16) ((offset >> 8) & 0xFF));
 }
+void print_backspace() {
+    int offset = get_cursor_pos()-2;
+    int row = offset / (2 * TEXT_WIDTH);
+    int col = (offset - (row*2*TEXT_WIDTH))/2;
+    if (col<= 1) return; 
+    print_char(0x00, 0x0f, col, row);
+    update_cursor(offset);
+}
+
 
 int print_char(char c, u8 color, int x, int y) {
     u8* video = (u8*)0xB8000;
     int offset;
     //checks if position is at cursot
-    if (x <= 0 && y <= 0) offset = get_cursor_pos();
+    if (x < 0 && y < 0) offset = get_cursor_pos();
     // else sets the cursor offset to the x and y pos
     else offset = (2*(y*TEXT_WIDTH + x));
     // checks if there is a newline and then updates the offset
-    if (c == '\n') offset = (2*((y+1)*TEXT_WIDTH));
+    if (c == '\n') offset = (2*(((offset / (2 * TEXT_WIDTH))+1)*TEXT_WIDTH));
     //else updates the video buffer plus the offset of the cursor with the color and then updates the offset
     else {
         *(video + offset) = c;
@@ -59,6 +69,10 @@ void print(char* string, u8 color, int x, int y) {
     for (int i = 0; string[i] != 0; i++) {
         int offset = print_char(string[i], color, x, y);
         x = (offset%TEXT_WIDTH)/2;
-        y = (offset/TEXT_WIDTH)/2;
+        y = (ceil(offset, TEXT_WIDTH)/2);
+        y+= (offset%TEXT_WIDTH)==0?1:0;
     }
+}
+void printf(char* string)  {
+    print(string, 0x0f, -1, -1);
 }

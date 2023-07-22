@@ -1,5 +1,5 @@
 #pragma once
-#include "util.h"
+#include "../kernel/types.h"
 
 void draw_char(int _x, int _y, char c, u8 color);
 
