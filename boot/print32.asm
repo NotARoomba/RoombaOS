@@ -16,7 +16,6 @@ print_pm_loop:
 	add edx, 2
 
 	jmp print_pm_loop
-
 print_pm_return:
 	popa
 	ret
