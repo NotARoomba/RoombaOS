@@ -1,17 +1,14 @@
-int __stack_chk_fail(void)
-{
-  return 0;
-}
 
-void print_c(char c, int color, volatile char *video) {
-  *video++ = c;
-  *video++ = color;
-}
+#include "util.h"
+#include "text.h"
+#include "screen.h"
 
 void kmain() {
-  volatile char *video = (volatile char*)0xb8000;
-  print_c('X', 0x0a, video);
-  video++;
-  video++;
-  print_c('X', 0x0a, video);
+  // screen_clear(0x00);
+  for(int i = 0; i<10; i++) {
+    draw_pixel(i,i,0x0a);
+  }
+  draw_char(100, 100, 35, 0x0a);
+  //print("aaaaaaaaaaaaa", 0x0a);
+  //print_c('X', 0x0a);
 }

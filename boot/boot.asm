@@ -25,8 +25,12 @@ jmp $
 switch_to_pm:
 	mov ax, 0x2401 ; A20?
 	int 0x15
-	mov ah, 0x0
-	mov al, 0x3
+	; text mode
+	; mov ah, 0x0
+	; mov al, 0x3
+	; int 0x10
+	;video mode
+	mov ax, 0x13
 	int 0x10
 	cli
 	lgdt [gdt_descriptor]
@@ -39,7 +43,7 @@ load_kernel:
 	call print
 
 	mov bx, KERNEL_OFFSET
-	mov dh, 2 ; sectors
+	mov dh, 50 ; sectors
 	mov dl, [BOOT_DISK]
 	call disk_load
 	ret
