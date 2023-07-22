@@ -68,9 +68,8 @@ int print_char(char c, u8 color, int x, int y) {
 void print(char* string, u8 color, int x, int y) {
     for (int i = 0; string[i] != 0; i++) {
         int offset = print_char(string[i], color, x, y);
-        x = (offset%TEXT_WIDTH)/2;
-        y = (ceil(offset, TEXT_WIDTH)/2);
-        y+= (offset%TEXT_WIDTH)==0?1:0;
+        y = ((offset/TEXT_WIDTH)/2);
+        x = (offset - (y*2*TEXT_WIDTH))/2;
     }
 }
 void printf(char* string)  {
