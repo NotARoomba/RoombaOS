@@ -6,6 +6,7 @@
 
 #define TEXT_HEIGHT 25
 #define TEXT_WIDTH 80
+#define TEXT_SIZE (TEXT_HEIGHT*TEXT_WIDTH)
 
 
 void draw_pixel(int _x, int _y, u8 color);

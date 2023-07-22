@@ -8,5 +8,5 @@ void kmain() {
   //draw_text(0, 0, "Welcome to RoombaOS!", 0x0a);
   // Test mode test
   print("start", 0x0a, -1, -1);
-  print("hello\nworld", 0x0a, 45, 23);
+  print("hello\nworld\na", 0x0a, 0, 23);
 }

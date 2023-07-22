@@ -1,5 +1,6 @@
 #include "screen.h"
 #include "ports.h"
+
 void __stack_chk_fail(){};
 // Graphics mode function
 void draw_pixel(int _x, int _y, u8 color) {
@@ -33,12 +34,23 @@ int print_char(char c, u8 color, int x, int y) {
     // else sets the cursor offset to the x and y pos
     else offset = (2*(y*TEXT_WIDTH + x));
     // checks if there is a newline and then updates the offset
-    if (c == '\n') offset = (2*((y+1)*TEXT_WIDTH + 0));
+    if (c == '\n') offset = (2*((y+1)*TEXT_WIDTH));
     //else updates the video buffer plus the offset of the cursor with the color and then updates the offset
     else {
         *(video + offset) = c;
         *(video + offset + 1) = color;
         offset+=2;
+    }
+    if (offset >= (TEXT_SIZE * 2)) {
+        //need to move every i row to i-1 where i is 1
+        for (int i = 1; i < TEXT_HEIGHT; i++) {
+            //copy the row back
+            memcpy(video + (2*((i-1)*TEXT_WIDTH)),video + (2*(i*TEXT_WIDTH)), TEXT_WIDTH*2);
+        }
+        // the last line has remenants from the prevoius offset
+        u8* line = video + (2*((TEXT_HEIGHT-1)*TEXT_WIDTH));
+        for (int i = 0; i < (TEXT_WIDTH*2); i++) line[i] = 0;
+        offset -= (2*TEXT_WIDTH);
     }
     update_cursor(offset);
     return offset;
