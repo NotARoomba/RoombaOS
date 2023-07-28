@@ -80,7 +80,7 @@ load_kernel:
 	call print
 
 	mov bx, KERNEL_OFFSET
-	mov dh, 52; sectors
+	mov dh, 40; sectors
 	mov dl, [BOOT_DISK]
 	call disk_load
 	ret

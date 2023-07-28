@@ -2,7 +2,7 @@
 # LD=/usr/local/i386elfgcc/bin/i386-elf-ld
 CC=gcc
 LD=ld -m elf_i386
-CFLAGS=-ffreestanding -m32 -fno-pie
+CFLAGS= -ffreestanding -m32 -fno-pie -nostdlib
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c interrupts/*.c libc/*.c)
 HEADERS = $(wildcard kernel/*.h drivers/*.h interrupts/*.h libc/*.h)
 OBJ = ${C_SOURCES:.c=.o interrupts/interrupt.o}
@@ -14,7 +14,8 @@ run: clean build
 build: ./boot/boot.bin kernel.bin
 	cat $^ > RoombaOS.bin
 kernel.bin: ./boot/kernel_entry.o ${OBJ}
-	$(LD) -o $@ -Ttext 0x1000 $^ --oformat binary
+	$(LD) -o $@ -Ttext 0x1000 $^
+	objcopy -O binary $@ $@
 %.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} -c $< -o $@
 
