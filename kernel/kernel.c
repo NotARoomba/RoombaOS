@@ -3,7 +3,6 @@
 #include "../libc/string.h"
 #include "../drivers/screen.h"
 #include "../interrupts/isr.h"
-
 void kmain() {
   // Graphics mode test
   //draw_text(0, 0, "Welcome to RoombaOS!", 0x0a);
@@ -11,7 +10,7 @@ void kmain() {
   //print("start\n", 0x0a, -1, -1);
     isr_install();
     irq_install();
-    print("Welcome to RoombaOS!\n", 0x0C, -1, -1);
+    print("Welcome to RoombaOS!\n", 0x0C, (vec2){-1, -1});
     printf("Type HELP for a list of commands\n> ");
 }
 
@@ -22,7 +21,10 @@ void user_input(char *input) {
     } else if(strcmp(input, "HELP") == 0) {
       printf("List of Commands: \n");
       printf("HELP - shows this menu\n");
+      printf("DRAW - draws text\n");
       printf("END - stops the CPU");
+    } else if (strcmp(input, "DRAW") == 0) {
+      draw_line((vec2){0, 0}, (vec2){300, 50}, 0x0e);
     } else {
       printf("\"");
       printf(input);

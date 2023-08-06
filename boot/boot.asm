@@ -32,12 +32,12 @@ switch_to_pm:
 	or ax, 3 << 9       ; set CR4.OSFXSR and CR4.OSXMMEXCPT at the same time
 	mov cr4, eax
 	;text mode
-	mov ah, 0x0
-	mov al, 0x3
-	int 0x10
-	;video mode
-	; mov ax, 0x13
+	; mov ah, 0x0
+	; mov al, 0x3
 	; int 0x10
+	;video mode
+	mov ax, 0x13
+	int 0x10
 	cli
 	lgdt [gdt_descriptor]
 	mov eax, cr0
